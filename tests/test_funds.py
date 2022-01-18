@@ -17,7 +17,6 @@ def test_portfolio_1():
     p.add_position(PDFFundReportFactory.create(get_fixtures("growing")),
                    get_fixtures("growing"))
     assert len(p.positions) == 2
-    assert len(p.assets) == 230
     assert len(p.df) == 253
     double_entries = \
         len(p.df.loc[:, "normalized_name"].value_counts().where(
@@ -59,3 +58,27 @@ def test_portfolio_4():
             lambda x: x > 1).dropna())
     assert double_entries == 7
     assert len(p.assets) == len(p.df) - double_entries
+
+
+def test_portfolio_5():
+    p = Portfolio()
+    p.add_position(PDFFundReportFactory.create(get_fixtures("digitalisation")),
+                   get_fixtures("digitalisation"))
+    assert len(p.df[p.df["normalized_name"].str.endswith("'a'")]) == 0
+
+
+def test_portfolio_6():
+    p = Portfolio()
+    p.add_position(PDFFundReportFactory.create(get_fixtures("swisscanto")),
+                   get_fixtures("swisscanto"))
+    assert len(p.df[p.df["normalized_name"] == ("applied materials")]) == 2
+    p.add_position(PDFFundReportFactory.create(get_fixtures("xtrackers_msci")),
+                   get_fixtures("xtrackers_msci"))
+    p.add_position(PDFFundReportFactory.create(get_fixtures("bond_green")),
+                   get_fixtures("bond_green"))
+    assert len(p.df[p.df["normalized_name"].str.endswith(" lab")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains("laboratories")]) == 0
+    assert len(p.df[p.df["normalized_name"].str.contains("labs")]) == 0
+    p.add_position(PDFFundReportFactory.create(get_fixtures("digitalisation")),
+                   get_fixtures("digitalisation"))
+    assert len(p.df[p.df["normalized_name"].str.contains("amazon\.com")]) == 0

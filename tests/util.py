@@ -84,7 +84,8 @@ def get_fixtures(key):
             "file": "./tests/artefacts/bond_green_test.pdf",
             "format": "P|i|i|c|B_1|i",
             "pages":
-                {"min": 0, "max": 10}
+                {"min": 0, "max": 10},
+            "weight": 5
         },
         "tecdax": {
             "date": "3000-01-01",

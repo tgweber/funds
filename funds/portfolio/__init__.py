@@ -33,13 +33,16 @@ class Portfolio(object):
              "co", "ag", "nv", "holding", "a", "c", "holdings",
              "inhaber", "namens", "shares", "bond",
              "government", "motors", "o.st", "vorzugsaktien", "H",
-             "inh", "akt", "vorzugsakt", "vorzugsakt.o.st.o.n.",
+             "inh", "akt", "vorzugsakt", "vorzugsakt.o.st.o.n",
              "aktien", "namens", "aandelen op naam eo  ,01", "hldg",
              "str. u.med.ag", "&co.kgaa", "n.v", "ag & co. kgaa", "sf 10",
              "sf 14,15", "eur 1", "s.a. actions nominatives", "nam",
              "strahlen  und medizintechnik", "a/s", "[taiwan]", "&", "a.s",
              "as", "vz", "pcl", "reit", "non voting", "b", "free", "ab",
-             "chf"]
+             "chf", "group", "class", "emtn regs v142024", "namen",
+             "inc v122022", "sa/nv", "inc^/*",
+             "wi", "fin", "se regs", "rc  ,10", "dl  ,54945", "v142021",
+             "bv", "144a"]
         self._ending_chars = ["", "^", "."]
 
     def add_position(self, fundReport, config):
@@ -90,7 +93,17 @@ class Portfolio(object):
     def normalize(self):
         if len(self.df) > 0:
             self.df["normalized_name"] = self.df["name"].str.lower().apply(
-                lambda x: re.sub(r'\(|\)', '', x)).str.replace("-", " ")
+                    lambda x: re.sub(r'"|\'|\(|\)', '', x)).str.replace(
+                        "-", " ")
+            self.df["normalized_name"] = self.df["normalized_name"].apply(
+                lambda x: re.sub(r'applied mat$', 'applied materials', x))
+            self.df["normalized_name"] = self.df["normalized_name"].apply(
+                lambda x: re.sub(r'( laboratories)|( labs)', ' lab', x))
+            self.df["normalized_name"] = self.df["normalized_name"].apply(
+                lambda x: re.sub(r'groip$', 'group', x))
+            self.df["normalized_name"] = \
+                self.df["normalized_name"].str.lower().apply(
+                    lambda x: re.sub(r'amazon\.com', 'amazon com', x))
             self.df["normalized_name"] = self.df["normalized_name"].apply(
                 lambda x: x.replace('\xad', ' ').strip())
 
@@ -108,9 +121,9 @@ class Portfolio(object):
                         self.df["normalized_name"] = get_normalization(
                             self.df, ending_final)
                         after = self.df.loc[:, "sid"].nunique()
-        self.df["sid_total_weight"] = self.df.groupby("sid").agg(
-            sid_total_weight=pd.NamedAgg(column='weight', aggfunc='sum')
-        )
+            self.df["sid_total_weight"] = self.df.groupby("sid").agg(
+                sid_total_weight=pd.NamedAgg(column='weight', aggfunc='sum')
+            )
 
 
 def get_normalization(df, ending):

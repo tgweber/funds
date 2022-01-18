@@ -1,10 +1,6 @@
-coverage
-flake8
-fmpsdk
 ipython
 levenshtein
 pandas
 pymupdf
-pytest
 pyyaml
 regex

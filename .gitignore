@@ -105,4 +105,7 @@ ENV/
 .vscode/
 .idea/
 
+# funds specific rules
 data/
+*.csv
+*.csv#

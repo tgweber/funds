@@ -76,9 +76,10 @@ def test_portfolio_6():
                    get_fixtures("xtrackers_msci"))
     p.add_position(PDFFundReportFactory.create(get_fixtures("bond_green")),
                    get_fixtures("bond_green"))
+    assert len(p.df[p.df["normalized_name"].str.contains("\xad")]) == 0
     assert len(p.df[p.df["normalized_name"].str.endswith(" lab")]) == 3
     assert len(p.df[p.df["normalized_name"].str.contains("laboratories")]) == 0
     assert len(p.df[p.df["normalized_name"].str.contains("labs")]) == 0
     p.add_position(PDFFundReportFactory.create(get_fixtures("digitalisation")),
                    get_fixtures("digitalisation"))
-    assert len(p.df[p.df["normalized_name"].str.contains("amazon\.com")]) == 0
+    assert len(p.df[p.df["normalized_name"].str.contains("amazon com")]) == 0

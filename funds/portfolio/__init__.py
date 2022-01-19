@@ -26,23 +26,99 @@ class Portfolio(object):
     def __init__(self):
         self.positions = PortfolioPositions()
         self._df = None
+        self._erase = [
+            r'"',
+            r'\'',
+            r'\(',
+            r'\)',
+        ]
+        self._find_replace = [
+            [r'applied mat($|\s+)', 'applied materials'],
+            [r'( laboratories)|( labs)', ' lab'],
+            [r' com($|\s+)', '.com '],
+            [r"\xad", ' '],
+            [r'-', ' '],
+        ]
         self._normalization_endings = \
-            ["sdi", "inc", "corp", "sa", "s.a", "se", "ltd",
-             "on", "o.n", "shs", "reg", "shs", "registered",
-             "asa", "plc", "corporation", "ag & co kgaa", "ag & co. kgaa",
-             "co", "ag", "nv", "holding", "a", "c", "holdings",
-             "inhaber", "namens", "shares", "bond",
-             "government", "motors", "o.st", "vorzugsaktien", "H",
-             "inh", "akt", "vorzugsakt", "vorzugsakt.o.st.o.n",
-             "aktien", "namens", "aandelen op naam eo  ,01", "hldg",
-             "str. u.med.ag", "&co.kgaa", "n.v", "ag & co. kgaa", "sf 10",
-             "sf 14,15", "eur 1", "s.a. actions nominatives", "nam",
-             "strahlen  und medizintechnik", "a/s", "[taiwan]", "&", "a.s",
-             "as", "vz", "pcl", "reit", "non voting", "b", "free", "ab",
-             "chf", "group", "class", "emtn regs v142024", "namen",
-             "inc v122022", "sa/nv", "inc^/*",
-             "wi", "fin", "se regs", "rc  ,10", "dl  ,54945", "v142021",
-             "bv", "144a"]
+            [
+                "&",
+                "&co.kgaa",
+                "144a"
+                "H",
+                "[taiwan]",
+                "a",
+                "a.s",
+                "a/s",
+                "aandelen op naam eo  ,01",
+                "ab",
+                "ag & co kgaa",
+                "ag & co. kgaa",
+                "ag",
+                "akt",
+                "aktien",
+                "as",
+                "asa",
+                "b",
+                "bond",
+                "bv",
+                "c",
+                "chf",
+                "class",
+                "co",
+                "corp",
+                "corporation",
+                "dl  ,54945",
+                "emtn regs v142024",
+                "eur 1",
+                "fin",
+                "free",
+                "government",
+                "group",
+                "hldg",
+                "holding",
+                "holdings",
+                "v122022",
+                "inc",
+                "inc^/*",
+                "inh",
+                "inhaber",
+                "ltd",
+                "motors",
+                "n.v",
+                "nam",
+                "namen",
+                "namens",
+                "non voting",
+                "nv",
+                "o.n",
+                "o.st",
+                "on",
+                "pcl",
+                "plc",
+                "rc  ,10",
+                "reg",
+                "registered",
+                "reit",
+                "s.a",
+                "s.a. actions nominatives",
+                "sa",
+                "sa/nv",
+                "sdi",
+                "se regs",
+                "se",
+                "sf 10",
+                "sf 14,15",
+                "shares",
+                "shs",
+                "str. u.med.ag",
+                "strahlen und medizintechnik",
+                "v142021",
+                "vorzugsakt",
+                "vorzugsakt.o.st.o.n",
+                "vorzugsaktien",
+                "vz",
+                "wi",
+             ]
         self._ending_chars = ["", "^", "."]
 
     def add_position(self, fundReport, config):
@@ -92,20 +168,15 @@ class Portfolio(object):
 
     def normalize(self):
         if len(self.df) > 0:
-            self.df["normalized_name"] = self.df["name"].str.lower().apply(
-                    lambda x: re.sub(r'"|\'|\(|\)', '', x)).str.replace(
-                        "-", " ")
-            self.df["normalized_name"] = self.df["normalized_name"].apply(
-                lambda x: re.sub(r'applied mat$', 'applied materials', x))
-            self.df["normalized_name"] = self.df["normalized_name"].apply(
-                lambda x: re.sub(r'( laboratories)|( labs)', ' lab', x))
-            self.df["normalized_name"] = self.df["normalized_name"].apply(
-                lambda x: re.sub(r'groip$', 'group', x))
+            # create
             self.df["normalized_name"] = \
-                self.df["normalized_name"].str.lower().apply(
-                    lambda x: re.sub(r'amazon\.com', 'amazon com', x))
-            self.df["normalized_name"] = self.df["normalized_name"].apply(
-                lambda x: x.replace('\xad', ' ').strip())
+                self.df["name"].apply(self.normalize_create)
+            # replace
+            self.df["normalized_name"] = \
+                self.df["normalized_name"].apply(self.normalize_replace)
+            # erase
+            self.df["normalized_name"] = \
+                self.df["normalized_name"].apply(self.normalize_erase)
 
             self.df["sid"] = \
                 self.df.groupby("normalized_name")["sid"].transform('first')
@@ -124,6 +195,18 @@ class Portfolio(object):
             self.df["sid_total_weight"] = self.df.groupby("sid").agg(
                 sid_total_weight=pd.NamedAgg(column='weight', aggfunc='sum')
             )
+
+    def normalize_create(self, string):
+        return " ".join(string.lower().split())
+
+    def normalize_erase(self, string):
+        return re.sub(r'{}'.format('|'.join(self._erase)), '', string)
+
+    def normalize_replace(self, string):
+        return_string = string
+        for (find, replace) in self._find_replace:
+            return_string = re.sub(find, replace, return_string)
+        return " ".join(return_string.split())
 
 
 def get_normalization(df, ending):

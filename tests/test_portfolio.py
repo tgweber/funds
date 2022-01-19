@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """Tests for `funds` package."""
-
+import pytest
 
 from funds.report.factory import PDFFundReportFactory
 from funds.portfolio import Portfolio
@@ -11,9 +11,12 @@ from tests.util import get_fixtures
 
 def test_portfolio_1():
     p = Portfolio()
+    with pytest.raises(ValueError):
+        p.df.to_csv()
     p.add_position(
         PDFFundReportFactory.create(get_fixtures("classic")),
         get_fixtures("classic"))
+
     p.add_position(PDFFundReportFactory.create(get_fixtures("growing")),
                    get_fixtures("growing"))
     assert len(p.positions) == 2

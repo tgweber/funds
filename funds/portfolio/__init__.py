@@ -31,8 +31,33 @@ class Portfolio(object):
             r'\'',
             r'\(',
             r'\)',
+            r',',
+            r'\^',
+            r'[',
+            r']',
         ]
         self.erase = re.compile(r'{}'.format('|'.join(self._erase)))
+
+        self._normalization_endings = \
+            [
+                "&", "&co.kgaa", "144a" "H", "[taiwan]", "a", "a.s", "a/s",
+                "aandelen op naam eo  ,01", "ab", "ag & co kgaa",
+                "ag & co. kgaa", "ag", "akt", "aktien", "as", "asa", "b",
+                "bond", "bv", "c", "chf", "class", "co", "corp", "corporation",
+                "dl  ,54945", "emtn regs v142024", "eur 1", "fin", "free",
+                "government", "group", "hldg", "holding", "holdings",
+                "v122022", "inc", "inc^/*", "inh", "inhaber", "ltd",
+                "motors", "n.v", "nam", "namen", "namens", "non voting", "nv",
+                "o.n", "o.st", "on", "pcl", "plc", "rc  ,10", "reg",
+                "registered", "reit", "s.a", "s.a. actions nominatives", "sa",
+                "sa/nv", "sdi", "se regs", "se", "sf 10", "sf 14,15", "shares",
+                "shs", "str. u.med.ag", "strahlen und medizintechnik",
+                "v142021", "vorzugsakt", "vorzugsakt.o.st.o.n",
+                "vorzugsaktien", "vz", "wi", "str", "u", "med",
+             ]
+        self._endings = \
+            re.compile(r"( ({})(^|\.)*)+$".format("|".join(
+                self._normalization_endings)))
 
         find_replace = [
             [r'applied mat($|\s+)', 'applied materials'],
@@ -44,87 +69,6 @@ class Portfolio(object):
         self._find_replace = [
             (re.compile(find), replace) for (find, replace) in find_replace
         ]
-        self._normalization_endings = \
-            [
-                "&",
-                "&co.kgaa",
-                "144a"
-                "H",
-                "[taiwan]",
-                "a",
-                "a.s",
-                "a/s",
-                "aandelen op naam eo  ,01",
-                "ab",
-                "ag & co kgaa",
-                "ag & co. kgaa",
-                "ag",
-                "akt",
-                "aktien",
-                "as",
-                "asa",
-                "b",
-                "bond",
-                "bv",
-                "c",
-                "chf",
-                "class",
-                "co",
-                "corp",
-                "corporation",
-                "dl  ,54945",
-                "emtn regs v142024",
-                "eur 1",
-                "fin",
-                "free",
-                "government",
-                "group",
-                "hldg",
-                "holding",
-                "holdings",
-                "v122022",
-                "inc",
-                "inc^/*",
-                "inh",
-                "inhaber",
-                "ltd",
-                "motors",
-                "n.v",
-                "nam",
-                "namen",
-                "namens",
-                "non voting",
-                "nv",
-                "o.n",
-                "o.st",
-                "on",
-                "pcl",
-                "plc",
-                "rc  ,10",
-                "reg",
-                "registered",
-                "reit",
-                "s.a",
-                "s.a. actions nominatives",
-                "sa",
-                "sa/nv",
-                "sdi",
-                "se regs",
-                "se",
-                "sf 10",
-                "sf 14,15",
-                "shares",
-                "shs",
-                "str. u.med.ag",
-                "strahlen und medizintechnik",
-                "v142021",
-                "vorzugsakt",
-                "vorzugsakt.o.st.o.n",
-                "vorzugsaktien",
-                "vz",
-                "wi",
-             ]
-        self._ending_chars = ["", "^", "."]
 
     def add_position(self, fundReport, config):
         self.positions.add(PortfolioPosition(fundReport, config))
@@ -159,18 +103,6 @@ class Portfolio(object):
         return group[["normalized_name",
                       "sid_total_weight"]].first().reset_index()
 
-    @property
-    def shares(self):
-        group = self.df[self.df["type"] == "share"].groupby("sid")
-        return group[["normalized_name",
-                      "sid_total_weight"]].first().reset_index()
-
-    @property
-    def bonds(self):
-        group = self.df[self.df["type"] == "bond"].groupby("sid")
-        return group[["normalized_name",
-                      "sid_total_weight"]].first().reset_index()
-
     def normalize(self):
         if len(self.df) > 0:
             # create
@@ -182,21 +114,13 @@ class Portfolio(object):
             # erase
             self.df["normalized_name"] = \
                 self.df["normalized_name"].apply(self.normalize_erase)
-
+            # endings
+            self.df["normalized_name"] = \
+                self.df["normalized_name"].apply(self.normalize_endings)
+            # create sid
             self.df["sid"] = \
                 self.df.groupby("normalized_name")["sid"].transform('first')
-            before = self.df.loc[:, "sid"].nunique()
-            after = 0
-            while before != after:
-                before = after
-                for ending in self._normalization_endings:
-                    for char in self._ending_chars:
-                        ending_final = ending + char
-                        group = self.df.groupby("normalized_name")["sid"]
-                        self.df["sid"] = group.transform('first')
-                        self.df["normalized_name"] = get_normalization(
-                            self.df, ending_final)
-                        after = self.df.loc[:, "sid"].nunique()
+            # calculate portfolio global weights
             self.df["sid_total_weight"] = self.df.groupby("sid").agg(
                 sid_total_weight=pd.NamedAgg(column='weight', aggfunc='sum')
             )
@@ -213,8 +137,5 @@ class Portfolio(object):
             return_string = re.sub(find, replace, return_string)
         return " ".join(return_string.split())
 
-
-def get_normalization(df, ending):
-    return df["normalized_name"].apply(
-        lambda x: x[:-(len(ending)+1)].strip()
-        if x.endswith(" {}".format(ending)) else x)
+    def normalize_endings(self, string):
+        return " ".join(re.sub(self._endings, '', string).split())

@@ -57,8 +57,8 @@ test: ## run tests quickly with the default Python
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source funds -m pytest
 	coverage report -m
-	coverage html
-	$(BROWSER) htmlcov/index.html
+	#coverage html
+	#$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/funds.rst

@@ -32,12 +32,17 @@ class Portfolio(object):
             r'\(',
             r'\)',
         ]
-        self._find_replace = [
+        self.erase = re.compile(r'{}'.format('|'.join(self._erase)))
+
+        find_replace = [
             [r'applied mat($|\s+)', 'applied materials'],
             [r'( laboratories)|( labs)', ' lab'],
             [r' com($|\s+)', '.com '],
             [r"\xad", ' '],
             [r'-', ' '],
+        ]
+        self._find_replace = [
+            (re.compile(find), replace) for (find, replace) in find_replace
         ]
         self._normalization_endings = \
             [
@@ -200,7 +205,7 @@ class Portfolio(object):
         return " ".join(string.lower().split())
 
     def normalize_erase(self, string):
-        return re.sub(r'{}'.format('|'.join(self._erase)), '', string)
+        return re.sub(self.erase, '', string)
 
     def normalize_replace(self, string):
         return_string = string

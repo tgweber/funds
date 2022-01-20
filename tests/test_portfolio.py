@@ -50,18 +50,39 @@ def test_portfolio_0():
     assert len(p.assets) + double_entries <= len(p.df)
 
     for e in p._erase:
-        print(e)
         assert len(p.df[p.df["normalized_name"].str.contains(e)]) == 0
     for f in p._find_replace:
-        print(f)
-        assert len(p.df[p.df["normalized_name"].str.contains(f[0])]) == 0
+        import pprint
+        pprint.pprint(f)
         assert len(p.df[p.df["normalized_name"].str.contains(f[1])]) > 0
     for e in p._normalization_endings:
         if e == "ag":
             continue
-        print(e)
         assert len(p.df[p.df["normalized_name"].str.contains(
             " {}$".format(e))]) == 0
+    # edge cases:
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "asian d development")]) == 0
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "bank of ny mellon")]) == 0
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "bnp paribas$")]) > 5
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^boliden$")]) > 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "cisco systems")]) > 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "citigroup")]) > 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "city developments")]) == 0
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "cppib capital$")]) > 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "e.on")]) > 0
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "east japan railway")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "eckert and ziegler")]) == 3
 
 
 def test_portfolio_1():
@@ -92,40 +113,6 @@ def test_portfolio_2():
         print(e)
         assert len(p.df[p.df["normalized_name"].str.contains(
             " {}$".format(e))]) == 0
-
-
-def test_portfolio_1():
-    p = Portfolio()
-    with pytest.raises(ValueError):
-        p.df.to_csv()
-    p.add_position(
-        PDFFundReportFactory.create(get_fixtures("classic")),
-        get_fixtures("classic"))
-
-    p.add_position(PDFFundReportFactory.create(get_fixtures("growing")),
-                   get_fixtures("growing"))
-    assert len(p.positions) == 2
-    assert len(p.df) == 253
-    double_entries = \
-        len(p.df.loc[:, "normalized_name"].value_counts().where(
-            lambda x: x > 1).dropna())
-    assert double_entries == 23
-    assert len(p.assets) + double_entries == len(p.df)
-
-
-def test_portfolio_2():
-    p = Portfolio()
-    p.add_position(
-        PDFFundReportFactory.create(get_fixtures("classic")),
-        get_fixtures("classic"))
-    assert len(p.positions) == 1
-    assert len(p.df) == 129
-    p.add_position(PDFFundReportFactory.create(get_fixtures("swisscanto")),
-                   get_fixtures("swisscanto"))
-    assert len(p.positions) == 2
-    assert len(p.df) == 733
-    assert len(p.df[p.df["type"] == "bond"]) == 523
-    assert len(p.df[p.df["type"] == "share"]) == 210
 
 
 def test_portfolio_3():

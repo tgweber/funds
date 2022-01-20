@@ -49,21 +49,33 @@ class Portfolio(object):
 
         self._normalization_endings = \
             [
-                r"v?\d+", "nk", "[a-zA-Z]{0,1}", "ost", "grp", "and",
-                "144a" "[taiwan]", "co", "kgaa", "ag"
-                "aandelen op naam eo", "ab", "adr",
-                "ag", "akt", "aktien", "as", "asa", "au", "bank",
-                "bond", "bv", "chf", "class", "co", "corp", "corporation",
-                "dl", "emtn", "eur", "fin", "free",
-                "government", "groip", "group", "hldg", "holding", "holdings",
-                "inc", "inh", "inhaber", "ltd",
-                "motors", "nam", "namen", "namens", "namensakt", "non voting",
-                "nv", "st", "on", "pcl", "plc", "rc", "reg",
-                "registered", "reit", "actions", "nominatives", "sa",
-                "sdi", "regs", "se", "sf", "shares",
-                "shs", "strahlen und medizintechnik", "usa",
-                "vorzugsakt", "st",
-                "vorzugsaktien", "vz", "wi", "str", "med",
+                r"v?\d+", "[a-zA-Z]{0,1}", "144a",
+                "aandelen", "ab", "actions", "and", "adr",
+                "ag", "akt", "aktien", "aktier", "as", "asa", "au",
+                "bank", "bond", "bv",
+                "chf", "cl", "class",
+                "co", "cos", "companies",
+                "corp", "corporation", "cv",
+                "de", "dl",
+                "emtn", "eo", "eur",
+                "femsa", "fin", "free", "frn",
+                "government",
+                "groip", "group", "grp",
+                "hbc", "hldg", "holding", "holdings",
+                "idec", "inc", "inh", "inhaber",
+                "kgaa",
+                "ltd",
+                "med", "motors",
+                "naam", "nam", "namen", "namens", "namensakt", "namn",
+                "nk", "non voting", "nominatives", "nv", "nvdr",
+                "on", "op", "ost",
+                "pcl", "plc",
+                "rc", "reg", "regs", "registered", "reit",
+                "sa", "sab", "sdi", "se", "sf", "shares",
+                "shs", "st", "str", "strahlen und medizintechnik", "sub",
+                "usa",
+                "vorzugsakt", "vorzugsaktien", "vot", "vz",
+                "wi",
              ]
         self._endings = \
             re.compile(r"( ({})(^|\.)*)+$".format("|".join(
@@ -77,8 +89,20 @@ class Portfolio(object):
             [r'( laboratories)|( labs)', ' lab'],
             [r' com(\s+|$)', '.com '],
             [r' bk$', ' banking'],
+            [r'asian\s*d?\s*dev(elopment)?\s*(banking)?.*',
+                'asian development banking'],
             [r' amr$', ' amro'],
             [r'^software$', 'software ag'],
+            [r' ny ', ' new york '],
+            [r'systms', 'systems'],
+            [r'bnp par$', 'bnp paribas'],
+            [r'borgwarner', 'borg warner'],
+            [r'cisco sys$', 'cisco systems'],
+            [r'citigp', 'citigroup'],
+            [r'city developments', 'city development'],
+            [r'cppib cap(it)?$', 'cppib capital'],
+            [r'^e on$', 'e.on'],
+            [r'^east jap(an)?( railway)?$', 'east japan railway'],
         ]
 
         self._find_replace = [
@@ -138,6 +162,11 @@ class Portfolio(object):
             # replace
             self.df["normalized_name"] = \
                 self.df["normalized_name"].apply(self.normalize_replace)
+            # isin
+            self._isin_lookup = self.df.groupby("isin").apply(
+                lambda x: x["normalized_name"].value_counts().index[0])
+            self.df["normalized_name"] = \
+                self.df.apply(self.normalize_isin, axis=1)
             # create sid
             self.df["sid"] = \
                 self.df.groupby("normalized_name")["sid"].transform('first')
@@ -163,3 +192,8 @@ class Portfolio(object):
 
     def normalize_endings(self, string):
         return " ".join(re.sub(self._endings, '', string).split())
+
+    def normalize_isin(self, asset):
+        if asset.get("isin") is None:
+            return asset.get("normalized_name")
+        return self._isin_lookup.loc[asset.get("isin")]

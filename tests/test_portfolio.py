@@ -9,6 +9,91 @@ from funds.portfolio import Portfolio
 from tests.util import get_fixtures
 
 
+def test_portfolio_0():
+    p = Portfolio()
+
+    funds = [
+        "ageing",
+        "amundi",
+        "avesco",
+        "bond_gov",
+        "bond_green",
+        "classic",
+        "digitalisation",
+        "earth",
+        "growing",
+        "klima",
+        "lyxor_energy",
+        "mobility",
+        "murphy",
+        "pictet",
+        "rize",
+        "rock",
+        "swisscanto",
+        "tecdax",
+        "ubs",
+        "wisdomtree",
+        "xtrackers_msci",
+        "xtrackers_wi",
+    ]
+    for fund in funds:
+        p.add_position(PDFFundReportFactory.create(get_fixtures(fund)),
+                       get_fixtures(fund))
+    assert len(p.positions) == 22
+    assert "normalized_name" in p.df.columns
+    assert "sid_total_weight" in p.assets.columns
+    assert p.assets.loc[:, "sid_total_weight"].sum() < 100
+    assert p.assets.loc[:, "sid_total_weight"].sum() > 90
+    double_entries = \
+        len(p.df.loc[:, "normalized_name"].value_counts().where(
+            lambda x: x > 1).dropna())
+    assert len(p.assets) + double_entries <= len(p.df)
+
+    for e in p._erase:
+        print(e)
+        assert len(p.df[p.df["normalized_name"].str.contains(e)]) == 0
+    for f in p._find_replace:
+        print(f)
+        assert len(p.df[p.df["normalized_name"].str.contains(f[0])]) == 0
+        assert len(p.df[p.df["normalized_name"].str.contains(f[1])]) > 0
+    for e in p._normalization_endings:
+        if e == "ag":
+            continue
+        print(e)
+        assert len(p.df[p.df["normalized_name"].str.contains(
+            " {}$".format(e))]) == 0
+
+
+def test_portfolio_1():
+    p = Portfolio()
+    with pytest.raises(ValueError):
+        p.df.to_csv()
+    p.add_position(
+        PDFFundReportFactory.create(get_fixtures("classic")),
+        get_fixtures("classic"))
+
+    p.add_position(PDFFundReportFactory.create(get_fixtures("growing")),
+                   get_fixtures("growing"))
+    assert len(p.positions) == 2
+    assert len(p.df) == 253
+    double_entries = \
+        len(p.df.loc[:, "normalized_name"].value_counts().where(
+            lambda x: x > 1).dropna())
+    assert double_entries == 23
+    assert len(p.assets) + double_entries == len(p.df)
+
+
+def test_portfolio_2():
+    p = Portfolio()
+    p.add_position(
+        PDFFundReportFactory.create(get_fixtures("classic")),
+        get_fixtures("classic"))
+    for e in p._normalization_endings:
+        print(e)
+        assert len(p.df[p.df["normalized_name"].str.contains(
+            " {}$".format(e))]) == 0
+
+
 def test_portfolio_1():
     p = Portfolio()
     with pytest.raises(ValueError):

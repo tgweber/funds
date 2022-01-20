@@ -33,27 +33,35 @@ class Portfolio(object):
             r'\)',
             r',',
             r'\^',
-            r'[',
-            r']',
+            r'\[',
+            r'\]',
             r'/',
+            r'\*',
         ]
         self.erase = re.compile(r'{}'.format('|'.join(self._erase)))
 
+        self._to_space = [
+            r"\xad",
+            r'-',
+            r'\.'
+        ]
+        self.to_space = re.compile(r'{}'.format('|'.join(self._to_space)))
+
         self._normalization_endings = \
             [
-                r"v?\d+$", "nk", "[a-zA-Z]{0,1}", "ost", "grp", "and",
+                r"v?\d+", "nk", "[a-zA-Z]{0,1}", "ost", "grp", "and",
                 "144a" "[taiwan]", "co", "kgaa", "ag"
-                "aandelen op naam eo", "ab",
-                "ag", "akt", "aktien", "as", "asa",
+                "aandelen op naam eo", "ab", "adr",
+                "ag", "akt", "aktien", "as", "asa", "au", "bank",
                 "bond", "bv", "chf", "class", "co", "corp", "corporation",
                 "dl", "emtn", "eur", "fin", "free",
-                "government", "group", "hldg", "holding", "holdings",
+                "government", "groip", "group", "hldg", "holding", "holdings",
                 "inc", "inh", "inhaber", "ltd",
                 "motors", "nam", "namen", "namens", "namensakt", "non voting",
                 "nv", "st", "on", "pcl", "plc", "rc", "reg",
                 "registered", "reit", "actions", "nominatives", "sa",
                 "sdi", "regs", "se", "sf", "shares",
-                "shs", "strahlen und medizintechnik",
+                "shs", "strahlen und medizintechnik", "usa",
                 "vorzugsakt", "st",
                 "vorzugsaktien", "vz", "wi", "str", "med",
              ]
@@ -63,16 +71,16 @@ class Portfolio(object):
 
         # order matters
         find_replace = [
-            [r"\xad", ' '],
-            [r'-', ' '],
-            [r'\.', ' '],
             [r'&', ' and '],
             [r'applied mat($|\s+)', 'applied materials'],
             [r'phillips 66', 'phillips sixtysix'],
             [r'( laboratories)|( labs)', ' lab'],
             [r' com(\s+|$)', '.com '],
-            [r' bk$', 'banking'],
+            [r' bk$', ' banking'],
+            [r' amr$', ' amro'],
+            [r'^software$', 'software ag'],
         ]
+
         self._find_replace = [
             (re.compile(find), replace) for (find, replace) in find_replace
         ]
@@ -118,12 +126,18 @@ class Portfolio(object):
             # erase
             self.df["normalized_name"] = \
                 self.df["normalized_name"].apply(self.normalize_erase)
+            # to-space
+            self.df["normalized_name"] = \
+                self.df["normalized_name"].apply(self.normalize_space)
             # replace
             self.df["normalized_name"] = \
                 self.df["normalized_name"].apply(self.normalize_replace)
             # endings
             self.df["normalized_name"] = \
                 self.df["normalized_name"].apply(self.normalize_endings)
+            # replace
+            self.df["normalized_name"] = \
+                self.df["normalized_name"].apply(self.normalize_replace)
             # create sid
             self.df["sid"] = \
                 self.df.groupby("normalized_name")["sid"].transform('first')
@@ -143,6 +157,9 @@ class Portfolio(object):
         for (find, replace) in self._find_replace:
             return_string = re.sub(find, replace, return_string)
         return " ".join(return_string.split())
+
+    def normalize_space(self, string):
+        return " ".join(re.sub(self.to_space, ' ', string).split())
 
     def normalize_endings(self, string):
         return " ".join(re.sub(self._endings, '', string).split())

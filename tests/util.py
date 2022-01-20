@@ -57,7 +57,8 @@ def get_fixtures(key):
             "file": "./tests/artefacts/murphyspitz_test.pdf",
             "format": "X|I|i|c|f|f|P",
             "pages":
-                {"min": 0, "max": 1}
+                {"min": 0, "max": 1},
+            "weight": 3
         },
         "pictet": {
             "date": "2021-09-30",
@@ -66,7 +67,8 @@ def get_fixtures(key):
             "file": "./tests/artefacts/pictet_test.pdf",
             "format": "N|c|f|f|P",
             "pages":
-                {"min": 0, "max": 2}
+                {"min": 0, "max": 2},
+            "weight": 2
         },
         "bond_gov": {
             "date": "2021-09-30",
@@ -75,7 +77,8 @@ def get_fixtures(key):
             "file": "./tests/artefacts/bond_gov_test.pdf",
             "format": "c|i|B|i|P",
             "pages":
-                {"min": 0, "max": 6}
+                {"min": 0, "max": 6},
+            "weight": 5
         },
         "bond_green": {
             "date": "2021-09-30",
@@ -95,7 +98,7 @@ def get_fixtures(key):
             "file": "./tests/artefacts/tecdax_test.pdf",
             "format": "N_1|I|s|i|i|i?-|c|f|f|P",
             "pages":
-                {"min": 0, "max": 0}
+                {"min": 0, "max": 0},
         },
         "avesco": {
             "date": "3000-01-02",

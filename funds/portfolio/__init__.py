@@ -35,36 +35,43 @@ class Portfolio(object):
             r'\^',
             r'[',
             r']',
+            r'/',
         ]
         self.erase = re.compile(r'{}'.format('|'.join(self._erase)))
 
         self._normalization_endings = \
             [
-                "&", "&co.kgaa", "144a" "H", "[taiwan]", "a", "a.s", "a/s",
-                "aandelen op naam eo  ,01", "ab", "ag & co kgaa",
-                "ag & co. kgaa", "ag", "akt", "aktien", "as", "asa", "b",
-                "bond", "bv", "c", "chf", "class", "co", "corp", "corporation",
-                "dl  ,54945", "emtn regs v142024", "eur 1", "fin", "free",
+                r"v?\d+$", "nk", "[a-zA-Z]{0,1}", "ost", "grp", "and",
+                "144a" "[taiwan]", "co", "kgaa", "ag"
+                "aandelen op naam eo", "ab",
+                "ag", "akt", "aktien", "as", "asa",
+                "bond", "bv", "chf", "class", "co", "corp", "corporation",
+                "dl", "emtn", "eur", "fin", "free",
                 "government", "group", "hldg", "holding", "holdings",
-                "v122022", "inc", "inc^/*", "inh", "inhaber", "ltd",
-                "motors", "n.v", "nam", "namen", "namens", "non voting", "nv",
-                "o.n", "o.st", "on", "pcl", "plc", "rc  ,10", "reg",
-                "registered", "reit", "s.a", "s.a. actions nominatives", "sa",
-                "sa/nv", "sdi", "se regs", "se", "sf 10", "sf 14,15", "shares",
-                "shs", "str. u.med.ag", "strahlen und medizintechnik",
-                "v142021", "vorzugsakt", "vorzugsakt.o.st.o.n",
-                "vorzugsaktien", "vz", "wi", "str", "u", "med",
+                "inc", "inh", "inhaber", "ltd",
+                "motors", "nam", "namen", "namens", "namensakt", "non voting",
+                "nv", "st", "on", "pcl", "plc", "rc", "reg",
+                "registered", "reit", "actions", "nominatives", "sa",
+                "sdi", "regs", "se", "sf", "shares",
+                "shs", "strahlen und medizintechnik",
+                "vorzugsakt", "st",
+                "vorzugsaktien", "vz", "wi", "str", "med",
              ]
         self._endings = \
             re.compile(r"( ({})(^|\.)*)+$".format("|".join(
                 self._normalization_endings)))
 
+        # order matters
         find_replace = [
-            [r'applied mat($|\s+)', 'applied materials'],
-            [r'( laboratories)|( labs)', ' lab'],
-            [r' com($|\s+)', '.com '],
             [r"\xad", ' '],
             [r'-', ' '],
+            [r'\.', ' '],
+            [r'&', ' and '],
+            [r'applied mat($|\s+)', 'applied materials'],
+            [r'phillips 66', 'phillips sixtysix'],
+            [r'( laboratories)|( labs)', ' lab'],
+            [r' com(\s+|$)', '.com '],
+            [r' bk$', 'banking'],
         ]
         self._find_replace = [
             (re.compile(find), replace) for (find, replace) in find_replace
@@ -108,12 +115,12 @@ class Portfolio(object):
             # create
             self.df["normalized_name"] = \
                 self.df["name"].apply(self.normalize_create)
-            # replace
-            self.df["normalized_name"] = \
-                self.df["normalized_name"].apply(self.normalize_replace)
             # erase
             self.df["normalized_name"] = \
                 self.df["normalized_name"].apply(self.normalize_erase)
+            # replace
+            self.df["normalized_name"] = \
+                self.df["normalized_name"].apply(self.normalize_replace)
             # endings
             self.df["normalized_name"] = \
                 self.df["normalized_name"].apply(self.normalize_endings)

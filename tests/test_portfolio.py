@@ -56,6 +56,7 @@ def test_portfolio_4():
                    get_fixtures("tecdax"))
     p.add_position(PDFFundReportFactory.create(get_fixtures("avesco")),
                    get_fixtures("avesco"))
+    assert len(p.df[p.df["normalized_name"].str.contains(r"\d+$")]) == 0
     double_entries = \
         len(p.df.loc[:, "normalized_name"].value_counts().where(
             lambda x: x > 1).dropna())

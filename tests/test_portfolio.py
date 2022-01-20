@@ -54,9 +54,11 @@ def test_portfolio_0():
     for f in p._find_replace:
         import pprint
         pprint.pprint(f)
+        if "mand" in f[1]:
+            continue
         assert len(p.df[p.df["normalized_name"].str.contains(f[1])]) > 0
     for e in p._normalization_endings:
-        if e == "ag":
+        if e == "ag" or "a-z" in e:
             continue
         assert len(p.df[p.df["normalized_name"].str.contains(
             " {}$".format(e))]) == 0
@@ -103,7 +105,44 @@ def test_portfolio_0():
         "^johnson controls$")]) == 3
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^jpmorgan chase$")]) == 5
-
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^kbc$")]) == 4
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^kimberly clark$")]) == 4
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^koninklijke$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^kuehne nagel international$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^l oreal$")]) == 4
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "lowes")]) == 4
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "m and g")]) == 1
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "m and t")]) == 1
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^m$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^magna international$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^marsh and mclennan$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^met life$")]) == 10
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^metro$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^minor international$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^mitsubishi chemical$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^mondelez$")]) == 4
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^moodys$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^morgan stan$")]) == 6
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^mtr$")]) == 4
 
 
 def test_portfolio_1():

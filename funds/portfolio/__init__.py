@@ -37,6 +37,10 @@ class Portfolio(object):
             r'\]',
             r'/',
             r'\*',
+            r'\+',
+            r'`',
+            r'´',
+            r'’',
         ]
         self.erase = re.compile(r'{}'.format('|'.join(self._erase)))
 
@@ -53,16 +57,16 @@ class Portfolio(object):
                 "aandelen", "ab", "actions", "and", "adr",
                 "ag", "akt", "aktien", "aktier", "as", "asa", "au",
                 "bank", "bhd", "bond", "bv",
-                "chf", "cl", "class",
+                "chf", "ci", "cl", "class",
                 "co", "cos", "companies",
                 "corp", "corporation", "cv",
-                "de", "dl",
+                "de", "dividende", "dl", "dsm",
                 "emtn", "eo", "eur",
                 "femsa", "fin", "finanzas", "free", "frn",
                 "government",
-                "groip", "groep?", "group", "grp",
+                "groip", "groep?", "groupe?", "grp",
                 "hbc", "hldg", "holding", "holdings",
-                "idec", "inc", "inh", "inhaber",
+                "idec", "in", "inc", "inh", "inhaber",
                 "kgaa",
                 "ltd", "limited",
                 "med", "motors",
@@ -74,8 +78,9 @@ class Portfolio(object):
                 "sa", "sab", "sdi", "se", "sf", "shares",
                 "shs", "st", "stapled security",
                 "str", "strahlen und medizintechnik", "sub",
+                r"thb\d+",
                 "usa",
-                "vorzugsakt", "vorzugsaktien", "vot", "vz",
+                "vopak", "vorzugsakt", "vorzugsaktien", "vot", "vtg", "vz",
                 "wi",
              ]
         self._endings = \
@@ -84,6 +89,10 @@ class Portfolio(object):
 
         # order matters
         find_replace = [
+            [r'^mandg$', 'm and g'],
+            [r'^mandt$', 'm and t'],
+            [r'm&g', 'mandg'],
+            [r'm&t', 'mandt'],
             [r'&', ' and '],
             [r'applied mat($|\s+)', 'applied materials'],
             [r'phillips 66', 'phillips sixtysix'],
@@ -111,6 +120,17 @@ class Portfolio(object):
             [r'johnson controls(( intl$)|( international$))',
                 'johnson controls'],
             [r'^jpm($|organ ch$)', 'jpmorgan chase'],
+            [r'^kimberly cl$', 'kimberly clark'],
+            [r'kreditanstalt fuer wiederaufbau', 'kfw'],
+            [r'^loyds$', 'loyds banking'],
+            [r'^loreal$', 'l oreal'],
+            [r'^lowe$', 'lowes'],
+            [r' intl$', ' international'],
+            [r'marsh mc lennan$', 'marsh and mclennan'],
+            [r'^metlife$', 'met life'],
+            [r'chem$', 'chemical'],
+            [r'moody s', 'moodys'],
+            [r'mor st$', 'morgan stan'],
         ]
 
         self._find_replace = [

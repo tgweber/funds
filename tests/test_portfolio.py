@@ -83,6 +83,27 @@ def test_portfolio_0():
         "east japan railway")]) == 3
     assert len(p.df[p.df["normalized_name"].str.contains(
         "eckert and ziegler")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "encompass health")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "engie")]) == 11
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "fresenius medical care")]) == 7
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^gpt$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^hca healthcare$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^iberdrola$")]) == 14
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^ing$")]) == 10
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "international flavors and fragrances")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^johnson controls$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^jpmorgan chase$")]) == 5
+
 
 
 def test_portfolio_1():

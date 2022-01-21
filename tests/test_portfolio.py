@@ -54,7 +54,7 @@ def test_portfolio_0():
     for f in p._find_replace:
         import pprint
         pprint.pprint(f)
-        if "mand" in f[1]:
+        if "mand" in f[1] or "sand" in f[1] or "tand" in f[1]:
             continue
         assert len(p.df[p.df["normalized_name"].str.contains(f[1])]) > 0
     for e in p._normalization_endings:
@@ -143,6 +143,88 @@ def test_portfolio_0():
         "^morgan stan$")]) == 6
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^mtr$")]) == 4
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^natwest$")]) == 4
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^nexi$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^nextera energy$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^novo nordisk$")]) == 5
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^oracle japan$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^orion$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^orsted$")]) == 7
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^prudential financial$")]) == 5
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^ptc therapeutics$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^quebec prov$")]) == 7
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^red electrica$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^ritchie brothers auctioneers$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^roche$")]) == 6
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^s and t$")]) == 1
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^salesforce.com$")]) == 4
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^sartorius$")]) == 5
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^sbab banking$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^shopify$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^sig combibloc$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^snam$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^sncf reseau$")]) == 5
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^stora enso$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^swisscom$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^t and d$")]) == 1
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^ericsson$")]) == 4
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^telefonica deutschland$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^telia$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^telus$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^trane technologies$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^travelers$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^ubs$")]) == 7
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^unibail rodamco$")]) == 4
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^unilever$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^united utilities$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^upm kymmene$")]) == 3
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^verizon communications$")]) == 5
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^vestas wind systems$")]) == 7
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^west japan railway$")]) == 5
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^wheaton precious metals$")]) == 2
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^yamaha$")]) == 5
+    assert len(p.df[p.df["normalized_name"].str.contains(
+        "^zurich insurance$")]) == 3
 
 
 def test_portfolio_1():

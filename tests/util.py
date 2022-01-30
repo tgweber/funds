@@ -1,4 +1,5 @@
-from funds.report.factory import PDFParser
+from funds.report.factory import PDFFundReportFactory, PDFParser, get_regex
+from funds.portfolio import Portfolio
 from pprint import pprint
 
 
@@ -220,6 +221,16 @@ def get_fixtures(key):
             "pages":
                 {"min": 0, "max": 1}
         },
+        "franklin": {
+            "date": "3000-01-02",
+            "weight": "5",
+            "name": "franklin",
+            "isin": "franklin",
+            "file": "./tests/artefacts/franklin_test.pdf",
+            "format": "i|N(<!&riz|i|P",
+            "pages":
+                {"min": 0, "max": 9}
+        },
 
     }
     return fixtures.get(key, None)
@@ -237,5 +248,40 @@ def iterate_pages(pages, config):
         print("Page checked  : {}".format(page))
         print("Assets counted: {}".format(len(page_as_rows)))
         print("Assets speced : {}".format(pages[index]))
-
+        print(config["format"])
+        print(get_regex(config["format"]))
         assert len(page_as_rows) == pages[index]
+
+
+def get_full_portfolio():
+    p = Portfolio()
+
+    funds = [
+        "ageing",
+        "amundi",
+        "avesco",
+        "bond_gov",
+        "bond_green",
+        "classic",
+        "digitalisation",
+        "earth",
+        "franklin",
+        "growing",
+        "klima",
+        "lyxor_energy",
+        "mobility",
+        "murphy",
+        "pictet",
+        "rize",
+        "rock",
+        "swisscanto",
+        "tecdax",
+        "ubs",
+        "wisdomtree",
+        "xtrackers_msci",
+        "xtrackers_wi",
+    ]
+    for fund in funds:
+        p.add_position(PDFFundReportFactory.create(get_fixtures(fund)),
+                       get_fixtures(fund))
+    return p

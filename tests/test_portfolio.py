@@ -6,40 +6,13 @@ import pytest
 from funds.report.factory import PDFFundReportFactory
 from funds.portfolio import Portfolio
 
-from tests.util import get_fixtures
+from tests.util import get_fixtures, get_full_portfolio
+
+p = get_full_portfolio()
 
 
 def test_portfolio_0():
-    p = Portfolio()
-
-    funds = [
-        "ageing",
-        "amundi",
-        "avesco",
-        "bond_gov",
-        "bond_green",
-        "classic",
-        "digitalisation",
-        "earth",
-        "growing",
-        "klima",
-        "lyxor_energy",
-        "mobility",
-        "murphy",
-        "pictet",
-        "rize",
-        "rock",
-        "swisscanto",
-        "tecdax",
-        "ubs",
-        "wisdomtree",
-        "xtrackers_msci",
-        "xtrackers_wi",
-    ]
-    for fund in funds:
-        p.add_position(PDFFundReportFactory.create(get_fixtures(fund)),
-                       get_fixtures(fund))
-    assert len(p.positions) == 22
+    assert len(p.positions) == 23
     assert "normalized_name" in p.df.columns
     assert "sid_total_weight" in p.assets.columns
     assert p.assets.loc[:, "sid_total_weight"].sum() < 100
@@ -62,169 +35,411 @@ def test_portfolio_0():
             continue
         assert len(p.df[p.df["normalized_name"].str.contains(
             " {}$".format(e))]) == 0
-    # edge cases:
+
+
+def test_portfolio_edge_0():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "asian d development")]) == 0
+
+
+def test_portfolio_edge_1():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "bank of ny mellon")]) == 0
+
+
+def test_portfolio_edge_2():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "bnp paribas$")]) > 5
+
+
+def test_portfolio_edge_3():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^boliden$")]) > 2
+
+
+def test_portfolio_edge_4():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "cisco systems")]) > 2
+
+
+def test_portfolio_edge_5():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "citigroup")]) > 2
+
+
+def test_portfolio_edge_6():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "city developments")]) == 0
+
+
+def test_portfolio_edge_7():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "cppib capital$")]) > 2
+
+
+def test_portfolio_edge_8():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "e.on")]) > 0
+
+
+def test_portfolio_edge_9():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "east japan railway")]) == 3
+
+
+def test_portfolio_edge_10():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "eckert and ziegler")]) == 3
+
+
+def test_portfolio_edge_11():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "encompass health")]) == 2
+
+
+def test_portfolio_edge_12():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "engie")]) == 11
+
+
+def test_portfolio_edge_13():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "fresenius medical care")]) == 7
+        "fresenius medical care")]) == 9
+
+
+def test_portfolio_edge_14():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^gpt$")]) == 2
+
+
+def test_portfolio_edge_15():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^hca healthcare$")]) == 3
+
+
+def test_portfolio_edge_16():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^iberdrola$")]) == 14
+        "^iberdrola$")]) == 15
+
+
+def test_portfolio_edge_17():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^ing$")]) == 10
+        "^ing$")]) == 11
+
+
+def test_portfolio_edge_18():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "international flavors and fragrances")]) == 3
+
+
+def test_portfolio_edge_19():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^johnson controls$")]) == 3
+
+
+def test_portfolio_edge_20():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^jpmorgan chase$")]) == 5
+
+
+def test_portfolio_edge_21():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^kbc$")]) == 4
+        "^kbc$")]) == 5
+
+
+def test_portfolio_edge_22():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^kimberly clark$")]) == 4
+
+
+def test_portfolio_edge_23():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^koninklijke$")]) == 3
+        "^koninklijke$")]) == 4
+
+
+def test_portfolio_edge_24():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^kuehne nagel international$")]) == 2
+
+
+def test_portfolio_edge_25():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^l oreal$")]) == 4
+        "^l oreal$")]) == 5
+
+
+def test_portfolio_edge_26():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "lowes")]) == 4
+
+
+def test_portfolio_edge_27():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "m and g")]) == 1
+        "m and g")]) == 2
+
+
+def test_portfolio_edge_28():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "m and t")]) == 1
+
+
+def test_portfolio_edge_29():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^m$")]) == 2
+
+
+def test_portfolio_edge_30():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^magna international$")]) == 3
+
+
+def test_portfolio_edge_31():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^marsh and mclennan$")]) == 2
+
+
+def test_portfolio_edge_32():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^met life$")]) == 10
+
+
+def test_portfolio_edge_33():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^metro$")]) == 2
+
+
+def test_portfolio_edge_34():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^minor international$")]) == 3
+
+
+def test_portfolio_edge_35():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^mitsubishi chemical$")]) == 2
+
+
+def test_portfolio_edge_36():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^mondelez$")]) == 4
+
+
+def test_portfolio_edge_37():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^moodys$")]) == 3
+
+
+def test_portfolio_edge_38():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^morgan stan$")]) == 6
+
+
+def test_portfolio_edge_39():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^mtr$")]) == 4
+
+
+def test_portfolio_edge_40():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^natwest$")]) == 4
+        "^natwest$")]) == 5
+
+
+def test_portfolio_edge_41():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^nexi$")]) == 2
+        "^nexi$")]) == 3
+
+
+def test_portfolio_edge_42():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^nextera energy$")]) == 3
+
+
+def test_portfolio_edge_43():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^novo nordisk$")]) == 5
+        "^novo nordisk$")]) == 6
+
+
+def test_portfolio_edge_44():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^oracle japan$")]) == 2
+
+
+def test_portfolio_edge_45():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^orion$")]) == 2
+        "^orion$")]) == 3
+
+
+def test_portfolio_edge_46():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^orsted$")]) == 7
+
+
+def test_portfolio_edge_47():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^prudential financial$")]) == 5
+        "^prudential financial$")]) == 6
+
+
+def test_portfolio_edge_48():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^ptc therapeutics$")]) == 3
+
+
+def test_portfolio_edge_49():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^quebec prov$")]) == 7
+
+
+def test_portfolio_edge_50():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^red electrica$")]) == 3
+        "^red electrica$")]) == 4
+
+
+def test_portfolio_edge_51():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^ritchie brothers auctioneers$")]) == 2
+
+
+def test_portfolio_edge_52():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^roche$")]) == 6
+        "^roche$")]) == 7
+
+
+def test_portfolio_edge_53():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^s and t$")]) == 1
+
+
+def test_portfolio_edge_54():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^salesforce.com$")]) == 4
+
+
+def test_portfolio_edge_55():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^sartorius$")]) == 5
+        "^sartorius$")]) == 6
+
+
+def test_portfolio_edge_56():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^sbab banking$")]) == 3
+
+
+def test_portfolio_edge_57():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^shopify$")]) == 3
+
+
+def test_portfolio_edge_58():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^sig combibloc$")]) == 3
+        "^sig combibloc$")]) == 4
+
+
+def test_portfolio_edge_59():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^snam$")]) == 3
+
+
+def test_portfolio_edge_60():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^sncf reseau$")]) == 5
+
+
+def test_portfolio_edge_61():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^stora enso$")]) == 2
+        "^stora enso$")]) == 3
+
+
+def test_portfolio_edge_62():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^swisscom$")]) == 2
+        "^swisscom$")]) == 3
+
+
+def test_portfolio_edge_63():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^t and d$")]) == 1
+
+
+def test_portfolio_edge_64():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^ericsson$")]) == 4
+        "^ericsson$")]) == 5
+
+
+def test_portfolio_edge_65():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^telefonica deutschland$")]) == 2
+
+
+def test_portfolio_edge_66():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^telia$")]) == 3
+        "^telia$")]) == 4
+
+
+def test_portfolio_edge_67():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^telus$")]) == 2
+
+
+def test_portfolio_edge_68():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^trane technologies$")]) == 2
+
+
+def test_portfolio_edge_69():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^travelers$")]) == 2
+
+
+def test_portfolio_edge_70():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^ubs$")]) == 7
+        "^ubs$")]) == 8
+
+
+def test_portfolio_edge_71():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^unibail rodamco$")]) == 4
+        "^unibail rodamco$")]) == 5
+
+
+def test_portfolio_edge_72():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^unilever$")]) == 2
+        "^unilever$")]) == 3
+
+
+def test_portfolio_edge_73():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^united utilities$")]) == 3
+        "^united utilities$")]) == 4
+
+
+def test_portfolio_edge_74():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^upm kymmene$")]) == 3
+        "^upm kymmene$")]) == 4
+
+
+def test_portfolio_edge_75():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^verizon communications$")]) == 5
+
+
+def test_portfolio_edge_76():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^vestas wind systems$")]) == 7
+        "^vestas wind systems$")]) == 8
+
+
+def test_portfolio_edge_77():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^west japan railway$")]) == 5
+
+
+def test_portfolio_edge_78():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^wheaton precious metals$")]) == 2
+
+
+def test_portfolio_edge_79():
     assert len(p.df[p.df["normalized_name"].str.contains(
         "^yamaha$")]) == 5
+
+
+def test_portfolio_edge_80():
     assert len(p.df[p.df["normalized_name"].str.contains(
-        "^zurich insurance$")]) == 3
+        "^zurich insurance$")]) == 4
 
 
 def test_portfolio_1():

@@ -202,3 +202,8 @@ def test_pdf_creation_avesco_1():
 
 def test_pdf_creation_mobility_1():
     iterate_pages([44, 15], get_fixtures("mobility"))
+
+
+def test_pdf_creation_franklin_1():
+    iterate_pages([43, 53, 52, 47, 46, 44, 55, 50, 53, 52],
+                  get_fixtures("franklin"))

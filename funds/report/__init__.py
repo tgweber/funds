@@ -1,6 +1,7 @@
 import pandas as pd
 
 from funds.asset import Bond, Share
+from funds.portfolio import Portfolio
 
 
 class FundReport(object):
@@ -70,3 +71,17 @@ class FundReport(object):
                 s_dict["due"] = None
             payload.append(s_dict)
         return pd.DataFrame(payload)
+
+    def simple_sim(self, other):
+        p1 = Portfolio()
+        p1.add_position(self, 1)
+        p2 = Portfolio()
+        p2.add_position(other, 1)
+        return p1.simple_sim(p2)
+
+    def simple_diff(self, other):
+        p1 = Portfolio()
+        p1.add_position(self, 1)
+        p2 = Portfolio()
+        p2.add_position(other, 1)
+        return p1.simple_diff(p2)

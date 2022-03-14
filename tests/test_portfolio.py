@@ -448,10 +448,10 @@ def test_portfolio_1():
         p.df.to_csv()
     p.add_position(
         PDFFundReportFactory.create(get_fixtures("classic")),
-        get_fixtures("classic"))
+        get_fixtures("classic")["weight"])
 
     p.add_position(PDFFundReportFactory.create(get_fixtures("growing")),
-                   get_fixtures("growing"))
+                   get_fixtures("growing")["weight"])
     assert len(p.positions) == 2
     assert len(p.df) == 253
     double_entries = \
@@ -465,7 +465,7 @@ def test_portfolio_2():
     p = Portfolio()
     p.add_position(
         PDFFundReportFactory.create(get_fixtures("classic")),
-        get_fixtures("classic"))
+        get_fixtures("classic")["weight"])
     for e in p._normalization_endings:
         print(e)
         assert len(p.df[p.df["normalized_name"].str.contains(
@@ -475,16 +475,16 @@ def test_portfolio_2():
 def test_portfolio_3():
     p = Portfolio()
     p.add_position(PDFFundReportFactory.create(get_fixtures("tecdax")),
-                   get_fixtures("tecdax"))
+                   get_fixtures("tecdax")["weight"])
     assert len(p.df) == 30
 
 
 def test_portfolio_4():
     p = Portfolio()
     p.add_position(PDFFundReportFactory.create(get_fixtures("tecdax")),
-                   get_fixtures("tecdax"))
+                   get_fixtures("tecdax")["weight"])
     p.add_position(PDFFundReportFactory.create(get_fixtures("avesco")),
-                   get_fixtures("avesco"))
+                   get_fixtures("avesco")["weight"])
     assert len(p.df[p.df["normalized_name"].str.contains(r"\d+$")]) == 0
     double_entries = \
         len(p.df.loc[:, "normalized_name"].value_counts().where(
@@ -496,23 +496,23 @@ def test_portfolio_4():
 def test_portfolio_5():
     p = Portfolio()
     p.add_position(PDFFundReportFactory.create(get_fixtures("digitalisation")),
-                   get_fixtures("digitalisation"))
+                   get_fixtures("digitalisation")["weight"])
     assert len(p.df[p.df["normalized_name"].str.endswith("'a'")]) == 0
 
 
 def test_portfolio_6():
     p = Portfolio()
     p.add_position(PDFFundReportFactory.create(get_fixtures("swisscanto")),
-                   get_fixtures("swisscanto"))
+                   get_fixtures("swisscanto")["weight"])
     assert len(p.df[p.df["normalized_name"] == ("applied materials")]) == 2
     p.add_position(PDFFundReportFactory.create(get_fixtures("xtrackers_msci")),
-                   get_fixtures("xtrackers_msci"))
+                   get_fixtures("xtrackers_msci")["weight"])
     p.add_position(PDFFundReportFactory.create(get_fixtures("bond_green")),
-                   get_fixtures("bond_green"))
+                   get_fixtures("bond_green")["weight"])
     assert len(p.df[p.df["normalized_name"].str.contains("\xad")]) == 0
     assert len(p.df[p.df["normalized_name"].str.endswith(" lab")]) == 3
     assert len(p.df[p.df["normalized_name"].str.contains("laboratories")]) == 0
     assert len(p.df[p.df["normalized_name"].str.contains("labs")]) == 0
     p.add_position(PDFFundReportFactory.create(get_fixtures("digitalisation")),
-                   get_fixtures("digitalisation"))
+                   get_fixtures("digitalisation")["weight"])
     assert len(p.df[p.df["normalized_name"].str.contains("amazon com")]) == 0

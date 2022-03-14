@@ -3,9 +3,9 @@ import re
 
 
 class PortfolioPosition(object):
-    def __init__(self, fundReport, config):
+    def __init__(self, fundReport, weight):
         self.fundReport = fundReport
-        self.weight = float(config["weight"])
+        self.weight = float(weight)
 
 
 class PortfolioPositions(object):
@@ -165,8 +165,8 @@ class Portfolio(object):
             (re.compile(find), replace) for (find, replace) in find_replace
         ]
 
-    def add_position(self, fundReport, config):
-        self.positions.add(PortfolioPosition(fundReport, config))
+    def add_position(self, fundReport, weight):
+        self.positions.add(PortfolioPosition(fundReport, weight))
         if self._df is not None:
             self._df.drop(["sid", "position_weight"], axis=1)
         self._df = pd.concat([self._df, fundReport.to_df()], ignore_index=True)
@@ -197,6 +197,11 @@ class Portfolio(object):
         group = self.df.groupby("sid")
         return group[["normalized_name",
                       "sid_total_weight"]].first().reset_index()
+
+    @property
+    def shared_assets(self):
+        return self.df.loc[:, "normalized_name"].value_counts().where(
+            lambda x: x > 1).dropna()
 
     def normalize(self):
         if len(self.df) > 0:
@@ -253,3 +258,18 @@ class Portfolio(object):
         if asset.get("isin") is None:
             return asset.get("normalized_name")
         return self._isin_lookup.loc[asset.get("isin")]
+
+    def simple_sim(self, other):
+        common_count = len(
+            self.assets[
+                self.assets["normalized_name"].isin(
+                    other.assets["normalized_name"]
+                )
+            ]
+        )
+        total_assets = \
+            pd.concat([self.assets, other.assets])["normalized_name"].nunique()
+        return common_count/total_assets
+
+    def simple_diff(self, other):
+        return 1 - self.simple_sim(other)

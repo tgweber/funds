@@ -283,5 +283,5 @@ def get_full_portfolio():
     ]
     for fund in funds:
         p.add_position(PDFFundReportFactory.create(get_fixtures(fund)),
-                       get_fixtures(fund))
+                       get_fixtures(fund)["weight"])
     return p

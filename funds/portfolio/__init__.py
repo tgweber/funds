@@ -273,3 +273,26 @@ class Portfolio(object):
 
     def simple_diff(self, other):
         return 1 - self.simple_sim(other)
+
+    def weighted_sim(self, other):
+        both = self.assets[
+            self.assets["normalized_name"].isin(
+                other.assets["normalized_name"]
+            )
+        ]
+        both = both.set_index("normalized_name")
+        both = both.drop(["sid"], axis=1)
+        both = both.rename(columns={"sid_total_weight": "weight1"})
+        both["weight2"] = other.assets[
+            other.assets["normalized_name"].isin(
+                both.index
+            )
+        ].set_index("normalized_name")["sid_total_weight"]
+        normalizer = (
+            self.df["sid_total_weight"].sum() +
+            other.df["sid_total_weight"].sum()
+        )/2
+        return both.min(axis=1).sum()/normalizer
+
+    def weighted_diff(self, other):
+        return 1 - self.weighted_sim(other)
